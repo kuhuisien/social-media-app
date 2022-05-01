@@ -1,14 +1,9 @@
-const books = [
-  {
-    title: "The Awakening",
-    author: "Kate Chopin",
-  },
-  {
-    title: "City of Glass",
-    author: "Paul Auster",
-  },
-];
+import { IContext } from "..";
 
 export const Query = {
-  books: () => books,
+  posts: (_: any, __: any, { prisma }: IContext) => {
+    return prisma.post.findMany({
+      orderBy: [{ createdAt: "desc" }],
+    });
+  },
 };
