@@ -36,6 +36,11 @@ export const typeDefs = gql`
     post: Post
   }
 
+  input PostInput {
+    title: String
+    content: String
+  }
+
   # The "Query" type is special: it lists all of the available queries that
   # clients can execute, along with the return type for each. In this
   # case, the "books" query returns an array of zero or more Books (defined above).
@@ -44,6 +49,15 @@ export const typeDefs = gql`
   }
 
   type Mutation {
-    postCreate(title: String!, content: String!): PostPayload
+    postCreate(post: PostInput!): PostPayload!
+    postUpdate(postId: ID!, post: PostInput!): PostPayload!
+    postDelete(postId: ID!): PostPayload!
+
+    signup(
+      email: String!
+      name: String!
+      password: String!
+      bio: String!
+    ): Boolean!
   }
 `;
