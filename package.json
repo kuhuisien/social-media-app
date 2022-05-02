@@ -21,10 +21,14 @@
   "dependencies": {
     "@prisma/client": "^3.13.0",
     "apollo-server": "^3.6.7",
+    "bcryptjs": "^2.4.3",
     "graphql": "^16.4.0",
+    "jsonwebtoken": "^8.5.1",
     "validator": "^13.7.0"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "@types/jsonwebtoken": "^8.5.8",
     "@types/validator": "^13.7.2",
     "prisma": "^3.13.0",
     "ts-node-dev": "^1.1.8",

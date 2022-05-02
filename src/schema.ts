@@ -31,14 +31,19 @@ export const typeDefs = gql`
     message: String!
   }
 
+  input PostInput {
+    title: String
+    content: String
+  }
+
   type PostPayload {
     userErrors: [UserError!]!
     post: Post
   }
 
-  input PostInput {
-    title: String
-    content: String
+  type AuthPayload {
+    userErrors: [UserError!]!
+    token: String!
   }
 
   # The "Query" type is special: it lists all of the available queries that
@@ -58,6 +63,6 @@ export const typeDefs = gql`
       name: String!
       password: String!
       bio: String!
-    ): Boolean!
+    ): AuthPayload!
   }
 `;
