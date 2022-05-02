@@ -3,12 +3,22 @@ import validator from "validator";
 import bcrypt from "bcryptjs";
 import JWT from "jsonwebtoken";
 import { JSON_SIGNATURE } from "../../keys";
+import { createJwtToken } from "../utils/createJwtToken";
 
 interface ISignupAgrs {
-  email: string;
+  credentials: {
+    email: string;
+    password: string;
+  };
   name: string;
   bio: string;
-  password: string;
+}
+
+interface ISigninAgrs {
+  credentials: {
+    email: string;
+    password: string;
+  };
 }
 
 interface IUserPayload {
@@ -19,9 +29,11 @@ interface IUserPayload {
 export const authResolvers = {
   signup: async (
     _: any,
-    { email, name, bio, password }: ISignupAgrs,
+    { credentials, name, bio }: ISignupAgrs,
     { prisma }: IContext
   ): Promise<IUserPayload> => {
+    const { email, password } = credentials;
+
     const isEmailValid = validator.isEmail(email);
     if (!isEmailValid) {
       return { userErrors: [{ message: "Invalid email" }], token: null };
@@ -57,12 +69,35 @@ export const authResolvers = {
       data: { email, name, password: hashedPassword },
     });
 
-    const token = await JWT.sign({ userId: user.id }, JSON_SIGNATURE, {
-      expiresIn: 300,
-    });
-
     await prisma.profile.create({ data: { bio, userId: user.id } });
 
-    return { userErrors: [], token };
+    return {
+      userErrors: [],
+      token: createJwtToken(user),
+    };
+  },
+
+  signin: async (
+    _: any,
+    { credentials }: ISigninAgrs,
+    { prisma }: IContext
+  ): Promise<IUserPayload> => {
+    const { email, password } = credentials;
+
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    if (!user) {
+      return { userErrors: [{ message: "Invalid credential" }], token: null };
+    }
+
+    const isMatched = await bcrypt.compare(password, user.password);
+    if (!isMatched) {
+      return { userErrors: [{ message: "Invalid credential" }], token: null };
+    }
+
+    return {
+      userErrors: [],
+      token: createJwtToken(user),
+    };
   },
 };

@@ -36,6 +36,11 @@ export const typeDefs = gql`
     content: String
   }
 
+  input CredentialsInput {
+    email: String!
+    password: String!
+  }
+
   type PostPayload {
     userErrors: [UserError!]!
     post: Post
@@ -43,7 +48,7 @@ export const typeDefs = gql`
 
   type AuthPayload {
     userErrors: [UserError!]!
-    token: String!
+    token: String
   }
 
   # The "Query" type is special: it lists all of the available queries that
@@ -59,10 +64,11 @@ export const typeDefs = gql`
     postDelete(postId: ID!): PostPayload!
 
     signup(
-      email: String!
+      credentials: CredentialsInput!
       name: String!
-      password: String!
       bio: String!
     ): AuthPayload!
+
+    signin(credentials: CredentialsInput!): AuthPayload!
   }
 `;
