@@ -1,8 +1,6 @@
 import { IContext } from "../..";
 import validator from "validator";
 import bcrypt from "bcryptjs";
-import JWT from "jsonwebtoken";
-import { JSON_SIGNATURE } from "../../keys";
 import { createJwtToken } from "../utils/createJwtToken";
 
 interface ISignupAgrs {

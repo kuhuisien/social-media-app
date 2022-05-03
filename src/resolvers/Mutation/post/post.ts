@@ -1,20 +1,12 @@
-import { Post, Prisma } from "@prisma/client";
-import { IContext } from "../..";
-
-interface IPostArgs {
-  post: {
-    title?: string;
-    content?: string;
-  };
-}
-
-interface IPostPayload {
-  userErrors: {
-    message: string;
-  }[];
-
-  post: Post | Prisma.Prisma__PostClient<Post> | null;
-}
+import { IContext } from "../../..";
+import { userMutatePostErrored } from "../../utils/userMutatePostErrored";
+import {
+  POST_AUTHENTICATION_ERROR,
+  POST_CREATION_INPUT_ERROR,
+  POST_NOT_EXIST_ERROR,
+  POST_UPDATE_INPUT_ERROR,
+} from "./constant";
+import { IPostArgs, IPostPayload } from "./post.types";
 
 export const postResolvers = {
   postCreate: async (
@@ -24,7 +16,7 @@ export const postResolvers = {
   ): Promise<IPostPayload> => {
     if (!userInfo) {
       return {
-        userErrors: [{ message: "Forbidden access (unauthenticatd)" }],
+        userErrors: [{ message: POST_AUTHENTICATION_ERROR }],
         post: null,
       };
     }
@@ -33,9 +25,7 @@ export const postResolvers = {
 
     if (!title || !content) {
       return {
-        userErrors: [
-          { message: "You must provide title and content to create a post" },
-        ],
+        userErrors: [{ message: POST_CREATION_INPUT_ERROR }],
         post: null,
       };
     }
@@ -51,15 +41,29 @@ export const postResolvers = {
   postUpdate: async (
     _: any,
     { post, postId }: { postId: string; post: IPostArgs["post"] },
-    { prisma }: IContext
+    { prisma, userInfo }: IContext
   ): Promise<IPostPayload> => {
+    if (!userInfo) {
+      return {
+        userErrors: [{ message: POST_AUTHENTICATION_ERROR }],
+        post: null,
+      };
+    }
+
+    const authorizationError = await userMutatePostErrored({
+      userId: userInfo.userId,
+      postId: Number(postId),
+      prisma,
+    });
+    if (authorizationError) {
+      return authorizationError;
+    }
+
     const { title, content } = post;
 
     if (!title && !content) {
       return {
-        userErrors: [
-          { message: "You need to have at least one field to update post" },
-        ],
+        userErrors: [{ message: POST_UPDATE_INPUT_ERROR }],
         post: null,
       };
     }
@@ -70,7 +74,7 @@ export const postResolvers = {
 
     if (!existingPost) {
       return {
-        userErrors: [{ message: "Post does not exist" }],
+        userErrors: [{ message: POST_NOT_EXIST_ERROR }],
         post: null,
       };
     }
@@ -95,15 +99,31 @@ export const postResolvers = {
   postDelete: async (
     _: any,
     { postId }: { postId: string },
-    { prisma }: IContext
+    { prisma, userInfo }: IContext
   ): Promise<IPostPayload> => {
+    if (!userInfo) {
+      return {
+        userErrors: [{ message: POST_AUTHENTICATION_ERROR }],
+        post: null,
+      };
+    }
+
+    const authorizationError = await userMutatePostErrored({
+      userId: userInfo.userId,
+      postId: Number(postId),
+      prisma,
+    });
+    if (authorizationError) {
+      return authorizationError;
+    }
+
     const post = await prisma.post.findUnique({
       where: { id: Number(postId) },
     });
 
     if (!post) {
       return {
-        userErrors: [{ message: "Post does not exist" }],
+        userErrors: [{ message: POST_NOT_EXIST_ERROR }],
         post: null,
       };
     }
