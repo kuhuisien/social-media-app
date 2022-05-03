@@ -2,6 +2,7 @@ import { ApolloServer } from "apollo-server";
 import { Mutation, Query } from "./resolvers";
 import { typeDefs } from "./schema";
 import { Prisma, PrismaClient } from "@prisma/client";
+import { getUserFromToken } from "./resolvers/utils/getUserFromToken";
 
 const prisma = new PrismaClient();
 
@@ -11,6 +12,7 @@ export interface IContext {
     never,
     Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
   >;
+  userInfo: { userId: number } | null;
 }
 
 // Resolvers define the technique for fetching the types defined in the
@@ -22,7 +24,14 @@ const resolvers = {
 
 // The ApolloServer constructor requires two parameters: your schema
 // definition and your set of resolvers.
-const server = new ApolloServer({ typeDefs, resolvers, context: { prisma } });
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  context: async ({ req }: any): Promise<IContext> => {
+    const userInfo = await getUserFromToken(req.headers.authorization);
+    return { prisma, userInfo };
+  },
+});
 
 // The `listen` method launches a web server.
 server.listen().then(({ url }) => {

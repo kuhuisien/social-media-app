@@ -20,8 +20,15 @@ export const postResolvers = {
   postCreate: async (
     _: any,
     { post }: IPostArgs,
-    { prisma }: IContext
+    { prisma, userInfo }: IContext
   ): Promise<IPostPayload> => {
+    if (!userInfo) {
+      return {
+        userErrors: [{ message: "Forbidden access (unauthenticatd)" }],
+        post: null,
+      };
+    }
+
     const { title, content } = post;
 
     if (!title || !content) {
@@ -36,7 +43,7 @@ export const postResolvers = {
     return {
       userErrors: [],
       post: prisma.post.create({
-        data: { title, content, authorId: 1 },
+        data: { title, content, authorId: userInfo.userId },
       }),
     };
   },
