@@ -21,7 +21,7 @@ npm run start:dev
 
 The page will reload if you make edits.
 
-2. Database schema is defined in prisma/schema.prisma. To trigger database update referencing the schema, run the following command:
+2. Database schema is defined in prisma/schema.prisma file. To trigger actual database schema update according to the schema file, run the following command:
 
 ```bash
 npx prisma db push
