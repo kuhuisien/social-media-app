@@ -1,7 +1,7 @@
 # social-media-app-backend
 
 This is a graphQL application built with Node.js (Apollo Server), prisma and PostgreSQL.
-POstgreSQL is hosted in Heroku.
+PostgreSQL is hosted in Heroku.
 
 ## Getting Started
 
@@ -13,7 +13,7 @@ npm install
 
 ### Running locally
 
-1. Spin up a local development server. Open [http://localhost:4000](http://localhost:4000) to access graphQL playground
+1. Spin up a local development server. Open [http://localhost:4000](http://localhost:4000) to access graphQL playground.
 
 ```bash
 npm run start:dev
