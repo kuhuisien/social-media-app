@@ -21,19 +21,19 @@ npm run start:dev
 
 The page will reload if you make edits.
 
-2. Database schema is defined in prisma/schema.prisma. To trigger database update referencing the schema, run the following command.
+2. Database schema is defined in prisma/schema.prisma. To trigger database update referencing the schema, run the following command:
 
 ```bash
 npx prisma db push
 ```
 
-3. To access visual editor for the data in database, run the following command.
+3. To access visual editor for the data in database, run the following command:
 
 ```bash
 npx prisma studio
 ```
 
-Then open [http://localhost:5555](http://localhost:5555) to view, edit or delete data in any tables in the database
+Then open [http://localhost:5555](http://localhost:5555) to view, edit or delete data in any tables in the database.
 
 ## Reference Documentation
 
