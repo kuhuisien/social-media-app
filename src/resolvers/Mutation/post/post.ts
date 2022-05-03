@@ -135,4 +135,34 @@ export const postResolvers = {
       post,
     };
   },
+
+  postPublish: async (
+    _: any,
+    { postId }: { postId: string },
+    { prisma, userInfo }: IContext
+  ): Promise<IPostPayload> => {
+    if (!userInfo) {
+      return {
+        userErrors: [{ message: POST_AUTHENTICATION_ERROR }],
+        post: null,
+      };
+    }
+
+    const authorizationError = await userMutatePostErrored({
+      userId: userInfo.userId,
+      postId: Number(postId),
+      prisma,
+    });
+    if (authorizationError) {
+      return authorizationError;
+    }
+
+    return {
+      userErrors: [],
+      post: prisma.post.update({
+        data: { published: true },
+        where: { id: Number(postId) },
+      }),
+    };
+  },
 };
