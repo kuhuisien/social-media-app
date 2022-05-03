@@ -1,28 +1,15 @@
-import { IContext } from "../..";
+import { IContext } from "../../..";
 import validator from "validator";
 import bcrypt from "bcryptjs";
-import { createJwtToken } from "../utils/createJwtToken";
-
-interface ISignupAgrs {
-  credentials: {
-    email: string;
-    password: string;
-  };
-  name: string;
-  bio: string;
-}
-
-interface ISigninAgrs {
-  credentials: {
-    email: string;
-    password: string;
-  };
-}
-
-interface IUserPayload {
-  userErrors: { message: string }[];
-  token: string | null;
-}
+import { createJwtToken } from "../../utils/createJwtToken";
+import { ISigninAgrs, ISignupAgrs, IUserPayload } from "./auth.types";
+import {
+  AUTH_BIO_INPUT_ERROR,
+  AUTH_EMAIL_INPUT_ERROR,
+  AUTH_NAME_INPUT_ERROR,
+  AUTH_PASSWORD_INPUT_ERROR,
+  AUTH_SIGN_IN_ERROR,
+} from "./constant";
 
 export const authResolvers = {
   signup: async (
@@ -34,29 +21,27 @@ export const authResolvers = {
 
     const isEmailValid = validator.isEmail(email);
     if (!isEmailValid) {
-      return { userErrors: [{ message: "Invalid email" }], token: null };
+      return { userErrors: [{ message: AUTH_EMAIL_INPUT_ERROR }], token: null };
     }
 
     const isPasswordValid = validator.isLength(password, { min: 5 });
     if (!isPasswordValid) {
       return {
-        userErrors: [
-          { message: "Password must contain at least five characters" },
-        ],
+        userErrors: [{ message: AUTH_PASSWORD_INPUT_ERROR }],
         token: null,
       };
     }
 
     if (!name) {
       return {
-        userErrors: [{ message: "Name is empty" }],
+        userErrors: [{ message: AUTH_NAME_INPUT_ERROR }],
         token: null,
       };
     }
 
     if (!bio) {
       return {
-        userErrors: [{ message: "Bio is empty" }],
+        userErrors: [{ message: AUTH_BIO_INPUT_ERROR }],
         token: null,
       };
     }
@@ -85,12 +70,12 @@ export const authResolvers = {
     const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
-      return { userErrors: [{ message: "Invalid credential" }], token: null };
+      return { userErrors: [{ message: AUTH_SIGN_IN_ERROR }], token: null };
     }
 
     const isMatched = await bcrypt.compare(password, user.password);
     if (!isMatched) {
-      return { userErrors: [{ message: "Invalid credential" }], token: null };
+      return { userErrors: [{ message: AUTH_SIGN_IN_ERROR }], token: null };
     }
 
     return {
