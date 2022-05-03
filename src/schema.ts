@@ -17,7 +17,6 @@ export const typeDefs = gql`
     id: ID!
     name: String!
     email: String!
-    profile: Profile!
     posts: [Post!]!
   }
 
@@ -56,6 +55,7 @@ export const typeDefs = gql`
   # case, the "books" query returns an array of zero or more Books (defined above).
   type Query {
     me: User
+    profile(userId: ID!): Profile
     posts: [Post!]!
   }
 

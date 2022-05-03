@@ -1,4 +1,4 @@
-import { IContext } from "..";
+import { IContext } from "../..";
 
 export const Query = {
   me: (_: any, __: any, { prisma, userInfo }: IContext) => {
@@ -7,6 +7,10 @@ export const Query = {
     }
 
     return prisma.user.findUnique({ where: { id: userInfo.userId } });
+  },
+
+  profile: (_: any, { userId }: { userId: string }, { prisma }: IContext) => {
+    return prisma.profile.findUnique({ where: { userId: Number(userId) } });
   },
 
   posts: (_: any, __: any, { prisma }: IContext) => {
