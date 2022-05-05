@@ -9,8 +9,22 @@ export const Query = {
     return prisma.user.findUnique({ where: { id: userInfo.userId } });
   },
 
-  profile: (_: any, { userId }: { userId: string }, { prisma }: IContext) => {
-    return prisma.profile.findUnique({ where: { userId: Number(userId) } });
+  profile: async (
+    _: any,
+    { userId }: { userId: string },
+    { prisma, userInfo }: IContext
+  ) => {
+    const isMyProfile = Number(userId) === userInfo?.userId;
+
+    const profile = await prisma.profile.findUnique({
+      where: { userId: Number(userId) },
+    });
+
+    if (!profile) {
+      return null;
+    }
+
+    return { ...profile, isMyProfile };
   },
 
   posts: (_: any, __: any, { prisma }: IContext) => {
