@@ -11,6 +11,8 @@ import {
   AUTH_SIGN_IN_ERROR,
 } from "./constant";
 
+const EXPIRES_IN = 900;
+
 export const authResolvers = {
   signup: async (
     _: any,
@@ -21,7 +23,11 @@ export const authResolvers = {
 
     const isEmailValid = validator.isEmail(email);
     if (!isEmailValid) {
-      return { userErrors: [{ message: AUTH_EMAIL_INPUT_ERROR }], token: null };
+      return {
+        userErrors: [{ message: AUTH_EMAIL_INPUT_ERROR }],
+        token: null,
+        expiresIn: 0,
+      };
     }
 
     const isPasswordValid = validator.isLength(password, { min: 5 });
@@ -29,6 +35,7 @@ export const authResolvers = {
       return {
         userErrors: [{ message: AUTH_PASSWORD_INPUT_ERROR }],
         token: null,
+        expiresIn: 0,
       };
     }
 
@@ -36,6 +43,7 @@ export const authResolvers = {
       return {
         userErrors: [{ message: AUTH_NAME_INPUT_ERROR }],
         token: null,
+        expiresIn: 0,
       };
     }
 
@@ -43,6 +51,7 @@ export const authResolvers = {
       return {
         userErrors: [{ message: AUTH_BIO_INPUT_ERROR }],
         token: null,
+        expiresIn: 0,
       };
     }
 
@@ -56,7 +65,8 @@ export const authResolvers = {
 
     return {
       userErrors: [],
-      token: createJwtToken(user),
+      token: createJwtToken(user, EXPIRES_IN),
+      expiresIn: EXPIRES_IN,
     };
   },
 
@@ -70,17 +80,26 @@ export const authResolvers = {
     const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
-      return { userErrors: [{ message: AUTH_SIGN_IN_ERROR }], token: null };
+      return {
+        userErrors: [{ message: AUTH_SIGN_IN_ERROR }],
+        token: null,
+        expiresIn: 0,
+      };
     }
 
     const isMatched = await bcrypt.compare(password, user.password);
     if (!isMatched) {
-      return { userErrors: [{ message: AUTH_SIGN_IN_ERROR }], token: null };
+      return {
+        userErrors: [{ message: AUTH_SIGN_IN_ERROR }],
+        token: null,
+        expiresIn: 0,
+      };
     }
 
     return {
       userErrors: [],
-      token: createJwtToken(user),
+      token: createJwtToken(user, EXPIRES_IN),
+      expiresIn: EXPIRES_IN,
     };
   },
 };

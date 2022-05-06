@@ -49,6 +49,7 @@ export const typeDefs = gql`
   type AuthPayload {
     userErrors: [UserError!]!
     token: String
+    expiresIn: Int
   }
 
   # The "Query" type is special: it lists all of the available queries that
